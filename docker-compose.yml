@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  mkdocs-app-git:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mkdocs-app-git
+    depends_on: 
+    - git-sync
+    volumes: [mkdocs-docs:/doc]
+    ports:
+      - 8000:8000
+    command: ["serve", "-a", "0.0.0.0:8000"]
+  git-sync:
+    image: openweb/git-sync:0.0.1
+    environment:
+      GIT_SYNC_REPO: "https://github.com/ZobairQ/mkdocs-git-sync"
+      GIT_SYNC_DEST: "/git"
+      GIT_SYNC_BRANCH: "master"
+      GIT_SYNC_REV: "FETCH_HEAD"
+      GIT_SYNC_WAIT: "10"
+    volumes:
+      - mkdocs-docs:/git:z
+    restart: always
+volumes:
+  mkdocs-docs:
+    driver: local
